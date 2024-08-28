@@ -162,6 +162,8 @@ class App (tk.Tk):
     def set_display_value(self, value):
         self.display.delete(0, tk.END)
         self.display.insert(tk.END, str(value))
+        self.update_conversion(float(value))
+
 
     def clear_labels(self):
         if hasattr(self, 'lblHex') and self.lblHex is not None:

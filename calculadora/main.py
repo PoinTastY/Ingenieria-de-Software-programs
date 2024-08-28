@@ -1,59 +1,189 @@
-from tkinter import ttk
+from tkinter import font, ttk
 import tkinter as tk
 from tkinter import messagebox
+from math import log, sqrt, factorial
+
+from application.converters import *
 
 class App (tk.Tk):
     def __init__(self):
         super().__init__()
         self.config(width=420, height=600)
         self.title("Calculadora Mamalona")
-        self.build_btns()
+        self.build_interface()
 
-    def build_btns(self) -> None:
-            self.display = tk.Entry(self).grid(row=0, column=0, rowspan=5)
-            self.lblHex = tk.Label(self, text="Hex").grid(row=1, column=0, rowspan=5)
-            self.lblDec = tk.Label(self, text="Dec").grid(row=2, column=0, rowspan=5)
-            self.lblOct = tk.Label(self, text="Oct").grid(row=3, column=0, rowspan=5)
-            self.lblBin = tk.Label(self, text="Bin").grid(row=4, column=0, rowspan=5)
+    def build_interface(self) -> None:
+        titlefont = font.Font(family="Helvetica", size=20)
+        self.display = tk.Entry(self, width=16, font=titlefont)
+        self.display.grid(row=0, column=0, columnspan=5)
 
-            self.btnA = tk.Button(self, text="A", command=self.btnAClicked).grid(row=5, column=0)
-            self.btnPower = tk.Button(self, text="^", command=self.btnPowerClicked).grid(row=5, column=1)
-            self.btnLog = tk.Button(self, text="log", command=self.btnLogClicked).grid(row=5, column=2)
-            self.btnCE = tk.Button(self, text="CE", command=self.btnCEClicked).grid(row=5, column=3)
-            self.btnPop = tk.Button(self, text="<-", command=self.btnPopClicked).grid(row=5, column=4)
+        self.conversion_frame = tk.Frame(self)
+        self.conversion_frame.grid(row=1, column=0, columnspan=5, sticky="ew")
 
-            self.btnB = tk.Button(self, text="B", command=self.btnBClicked).grid(row=6, column=0)
-            self.btnRoot = tk.Button(self, text="√", command=self.btnRootClicked).grid(row=6, column=1)
-            self.btnNot = tk.Button(self, text="n!", command=self.btnNotClicked).grid(row=6, column=2)
-            self.btnModule = tk.Button(self, text="%", command=self.btnModuleClicked).grid(row=6, column=3)
-            self.btnDiv = tk.Button(self, text="/", command=self.btnDivClicked).grid(row=6, column=4)
+        self.update_conversion(0)#conversion labels
 
-            self.btnC = tk.Button(self, text="C", command=self.btnCClicked).grid(row=7, column=0)
-            self.btn7 = tk.Button(self, text="7", command=self.btn7Clicked).grid(row=7, column=1)
-            self.btn8 = tk.Button(self, text="8", command=self.btn8Clicked).grid(row=7, column=2)
-            self.btn9 = tk.Button(self, text="9", command=self.btn9Clicked).grid(row=7, column=3)
-            self.btnMult = tk.Button(self, text="*", command=self.btnMultClicked).grid(row=7, column=4)
+        buttons = [
+            ('A', self.btnAClicked), ('^', self.btnPowerClicked), ('log', self.btnLogClicked), ('CE', self.btnCEClicked), ('<-', self.btnPopClicked),
+            ('B', self.btnBClicked), ('√', self.btnRootClicked), ('n!', self.btnNotClicked), ('%', self.btnModuleClicked), ('/', self.btnDivClicked),
+            ('C', self.btnCClicked), ('7', self.btn7Clicked), ('8', self.btn8Clicked), ('9', self.btn9Clicked), ('*', self.btnMultClicked),
+            ('D', self.btnDClicked), ('4', self.btn4Clicked), ('5', self.btn5Clicked), ('6', self.btn6Clicked), ('-', self.btnSubClicked),
+            ('E', self.btnEClicked), ('1', self.btn1Clicked), ('2', self.btn2Clicked), ('3', self.btn3Clicked), ('+', self.btnAddClicked),
+            ('!=', self.btnNotEqualClicked), ('Abs', self.btnAbsoluteClicked), ('0', self.btn0Clicked), ('.', self.btnDotClicked), ('=', self.btnEqualClicked)
+        ]
 
-            self.btnD = tk.Button(self, text="D", command=self.btnDClicked).grid(row=8, column=0)
-            self.btn4 = tk.Button(self, text="4", command=self.btn4Clicked).grid(row=8, column=1)
-            self.btn5 = tk.Button(self, text="5", command=self.btn5Clicked).grid(row=8, column=2)
-            self.btn6 = tk.Button(self, text="6", command=self.btn6Clicked).grid(row=8, column=3)
-            self.btnSub = tk.Button(self, text="-", command=self.btnSubClicked).grid(row=8, column=4)
+        row = 5
+        col = 0
+        for (text, command) in buttons:
+            tk.Button(self, text=text, command=command, width=6).grid(row=row, column=col, padx=3, pady=3)
+            col += 1
+            if col > 4:
+                col = 0
+                row += 1
 
-            self.btnE = tk.Button(self, text="E", command=self.btnEClicked).grid(row=9, column=0)
-            self.btn1 = tk.Button(self, text="1", command=self.btn1Clicked).grid(row=9, column=1)
-            self.btn2 = tk.Button(self, text="2", command=self.btn2Clicked).grid(row=9, column=2)
-            self.btn3 = tk.Button(self, text="3", command=self.btn3Clicked).grid(row=9, column=3)
-            self.btnAdd = tk.Button(self, text="+", command=self.btnAddClicked).grid(row=9, column=4)
+    def btnAClicked(self):
+        self.display.insert(tk.END, 'A')
 
-            self.btnNotEqual = tk.Button(self, text="!=", command=self.btnNotEqualClicked).grid(row=10, column=0)
-            self.btnAbsolute = tk.Button(self, text="Abs", command=self.btnAbsoluteClicked).grid(row=10, column=1)
-            self.btn0 = tk.Button(self, text="0", command=self.btn0Clicked).grid(row=10, column=2)
-            self.btnDot = tk.Button(self, text=".", command=self.btnDotClicked).grid(row=10, column=3)
-            self.btnEqual = tk.Button(self, text="=", command=self.btnEqualClicked).grid(row=10, column=4)
+    def btnPowerClicked(self):
+        value = self.get_current_value()
+        self.display.insert(tk.END, '**')
 
-    def btnAClicked():
-         
+    def btnLogClicked(self):
+        value = self.get_current_value()
+        result = log(value)
+        self.set_display_value(result)
+
+    def btnCEClicked(self):
+        self.display.delete(0, tk.END)
+        self.update_conversion(0)
+
+    def btnPopClicked(self):
+        current_text = self.display.get()
+        if current_text:
+            self.display.delete(len(current_text) - 1)
+
+    def btnBClicked(self):
+        self.display.insert(tk.END, 'B')
+
+    def btnRootClicked(self):
+        value = self.get_current_value()
+        result = sqrt(value)
+        self.set_display_value(result)
+
+    def btnNotClicked(self):
+        value = self.get_current_value()
+        result = factorial(int(value))
+        self.set_display_value(result)
+
+    def btnModuleClicked(self):
+        self.display.insert(tk.END, '%')
+
+    def btnDivClicked(self):
+        self.display.insert(tk.END, '/')
+
+    def btnCClicked(self):
+        self.display.insert(tk.END, 'C')
+
+    def btn7Clicked(self):
+        self.display.insert(tk.END, '7')
+
+    def btn8Clicked(self):
+        self.display.insert(tk.END, '8')
+
+    def btn9Clicked(self):
+        self.display.insert(tk.END, '9')
+
+    def btnMultClicked(self):
+        self.display.insert(tk.END, '*')
+
+    def btnDClicked(self):
+        self.display.insert(tk.END, 'D')
+
+    def btn4Clicked(self):
+        self.display.insert(tk.END, '4')
+
+    def btn5Clicked(self):
+        self.display.insert(tk.END, '5')
+
+    def btn6Clicked(self):
+        self.display.insert(tk.END, '6')
+
+    def btnSubClicked(self):
+        self.display.insert(tk.END, '-')
+
+    def btnEClicked(self):
+        self.display.insert(tk.END, 'E')
+
+    def btn1Clicked(self):
+        self.display.insert(tk.END, '1')
+
+    def btn2Clicked(self):
+        self.display.insert(tk.END, '2')
+
+    def btn3Clicked(self):
+        self.display.insert(tk.END, '3')
+
+    def btnAddClicked(self):
+        self.display.insert(tk.END, '+')
+
+    def btnNotEqualClicked(self):
+        self.display.insert(tk.END, '!=')
+
+    def btnAbsoluteClicked(self):
+        value = self.get_current_value()
+        result = abs(value)
+        self.set_display_value(result)
+
+    def btn0Clicked(self):
+        self.display.insert(tk.END, '0')
+
+    def btnDotClicked(self):
+        self.display.insert(tk.END, '.')
+
+    def btnEqualClicked(self):
+        try:
+            result = eval(self.display.get())
+            self.set_display_value(result)
+            self.update_conversion(result)
+        except Exception as e:
+            self.display.delete(0, tk.END)
+            self.display.insert(tk.END, "Syntax Error")
+
+    def get_current_value(self):
+        try:
+            return float(self.display.get())
+        except ValueError:
+            return 0.0
+
+    def set_display_value(self, value):
+        self.display.delete(0, tk.END)
+        self.display.insert(tk.END, str(value))
+
+    def clear_labels(self):
+        if hasattr(self, 'lblHex') and self.lblHex is not None:
+            self.lblHex.destroy()
+        if hasattr(self, 'lblDec') and self.lblDec is not None:
+            self.lblDec.destroy()
+        if hasattr(self, 'lblOct') and self.lblOct is not None:
+            self.lblOct.destroy()
+        if hasattr(self, 'lblBin') and self.lblBin is not None:
+            self.lblBin.destroy()
+
+    def update_conversion(self, value):
+
+        for widget in self.conversion_frame.winfo_children():
+            widget.destroy()
+
+        self.lblHex = tk.Label(self.conversion_frame, text=f"Hex: {Dec_Hex(value)}", anchor="w")
+        self.lblHex.grid(row=0, column=0, columnspan=5, sticky="w")
+
+        self.lblDec = tk.Label(self.conversion_frame, text=f"Dec: {str(value)}", anchor="w")
+        self.lblDec.grid(row=1, column=0, columnspan=5, sticky="w")
+
+        self.lblOct = tk.Label(self.conversion_frame, text=f"Oct: {Dec_Oct(value)}", anchor="w")
+        self.lblOct.grid(row=2, column=0, columnspan=5, sticky="w")
+
+        self.lblBin = tk.Label(self.conversion_frame, text=f"Bin: {Dec_Bin(value)}", anchor="w")
+        self.lblBin.grid(row=3, column=0, columnspan=5, sticky="w")
 
 
 if __name__ == "__main__":

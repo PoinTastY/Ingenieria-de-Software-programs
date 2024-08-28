@@ -22,6 +22,8 @@ def Bin_Dec (numero : str) -> int:
         j -= 1
     return decimal
 def Dec_Oct (numero : int) -> str:
+    if(numero == 0):
+        return "0"
     octal = ""
     while numero > 0:
         octal = str(numero % 8) + octal
@@ -39,6 +41,8 @@ def Oct_Dec (numero : str) -> int:
     return decimal
 
 def Dec_Hex (numero : int) -> str:
+    if(numero == 0):
+        return "0"
     hexa = ""
     while numero > 0:
         residuo = numero % 16

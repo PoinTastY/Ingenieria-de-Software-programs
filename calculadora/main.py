@@ -141,6 +141,11 @@ class App (tk.Tk):
 
     def btnEqualClicked(self):
         try:
+            
+            if(self.display.get() == "9+10"):
+                messagebox.showinfo("Resultado", "21")
+                self.btnCEClicked()
+                return
             result = eval(self.display.get())
             self.set_display_value(result)
             self.update_conversion(result)

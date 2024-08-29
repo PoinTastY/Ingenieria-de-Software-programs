@@ -33,7 +33,7 @@ class App(tk.Tk):
     def updateUI(self, event):
         figura = self.optShape.get()
         
-        # Limpiamos y ocultamos los elementos opcionales
+        # hide and clear stuff
         if self.lbLados:
             self.lbLados.place_forget()
         if self.txLados:

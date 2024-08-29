@@ -10,14 +10,12 @@ def nuevo():
 
     limpiar_campos()
 
-    # Habilitar campos de texto para nuevo ingreso
-    entry_id.config(state=tk.NORMAL)
+    # enable disable stuff
     entry_titulo.config(state=tk.NORMAL)
     entry_autor.config(state=tk.NORMAL)
     entry_editorial.config(state=tk.NORMAL)
     combo_clasificacion.config(state=tk.NORMAL)
 
-    # Deshabilitar botones no permitidos
     btn_nuevo.config(state=tk.DISABLED)
     btn_editar.config(state=tk.DISABLED)
     btn_eliminar.config(state=tk.DISABLED)
@@ -41,19 +39,19 @@ def guardar():
 
     libro_existente = None
     for libro in libros:
-        if libro["ID"] == id_libro:  # Convertir a int porque los IDs se almacenan como enteros
+        if libro["ID"] == id_libro: 
             libro_existente = libro
             break
 
     if libro_existente:
-        # Si el libro existe, actualizamos su información
+        # if exist, we update
         libro_existente["Título"] = titulo
         libro_existente["Autor"] = autor
         libro_existente["Editorial"] = editorial
         libro_existente["Clasificación"] = clasificacion
         print(f"Libro actualizado: {libro_existente}")
     else:
-        # Si el libro no existe, creamos uno nuevo
+        # if not exist, we create
         nuevo_libro = {
             "ID": id_libro,
             "Título": titulo,
@@ -63,18 +61,16 @@ def guardar():
         }
         libros.append(nuevo_libro)
         print(f"Libro guardado: {nuevo_libro}")
-        
-        # Solo incrementamos last_id si estamos agregando un nuevo libro
+        #update global index variable
         last_id += 1
 
-    # Rehabilitar botones y deshabilitar el campo de edición
+    # update ui
     btn_nuevo.config(state=tk.NORMAL)
     btn_editar.config(state=tk.DISABLED)
     btn_eliminar.config(state=tk.DISABLED)
     btn_guardar.config(state=tk.DISABLED)
     btn_cancelar.config(state=tk.DISABLED)
 
-    # Limpiar campos y deshabilitar la edición
     limpiar_campos()
 
 def buscar():
@@ -85,7 +81,7 @@ def buscar():
         limpiar_campos()
         return
 
-    # Buscar el libro por ID
+    # find by id
     libro_encontrado = None
     for libro in libros:
         if libro["ID"] == id_busqueda:
@@ -93,7 +89,7 @@ def buscar():
             break
 
     if libro_encontrado:
-        # Mostrar los datos del libro en los campos
+        #display match
         entry_id.config(state=tk.NORMAL)
         entry_id.delete(0, tk.END)
         entry_id.insert(0, libro_encontrado["ID"])
@@ -118,47 +114,43 @@ def buscar():
         combo_clasificacion.set(libro_encontrado["Clasificación"])
         combo_clasificacion.config(state=tk.DISABLED)
 
-        # Habilitar los botones de editar y eliminar
+        # enable edit or delete
         btn_editar.config(state=tk.NORMAL)
         btn_eliminar.config(state=tk.NORMAL)
     else:
-        # Mostrar mensaje si no se encuentra el libro
+        # show not found
         messagebox.showinfo("Información", f"No se encontró ningún libro con ID {id_busqueda}")
         limpiar_campos()
 
 def editar():
-    #Habilitar los campos de edición
+    #enable/disable entries
     entry_titulo.config(state=tk.NORMAL)
     entry_autor.config(state=tk.NORMAL)
     entry_editorial.config(state=tk.NORMAL)
     combo_clasificacion.config(state=tk.NORMAL)
     
-    # Habilitar los botones necesarios
     btn_guardar.config(state=tk.NORMAL)
     btn_cancelar.config(state=tk.NORMAL)
 
-    # Deshabilitar otros botones
     btn_editar.config(state=tk.DISABLED)
     btn_eliminar.config(state=tk.DISABLED)
     btn_nuevo.config(state=tk.DISABLED)
 
 def eliminar():
-     # Confirmar eliminación
+     # confirm elimination
     respuesta = messagebox.askyesno("Confirmar eliminación", f"¿Está seguro de eliminar el libro con ID {entry_id.get()}?")
     
     if respuesta:
-        # Eliminar el libro de la lista
         for libro in libros:
             if libro["ID"] == entry_id.get():
                 libros.remove(libro)
                 print(f"Libro eliminado: {entry_titulo.get()}")  # Para verificar en consola
                 break
         
-        # Limpiar los campos y reiniciar la selección
         limpiar_campos()
         libro_actual = None
 
-        # Habilitar/deshabilitar botones correspondientes
+        #update ui
         btn_nuevo.config(state=tk.NORMAL)
         btn_editar.config(state=tk.DISABLED)
         btn_eliminar.config(state=tk.DISABLED)
@@ -168,14 +160,13 @@ def eliminar():
         messagebox.showinfo("Información", "Libro eliminado correctamente.")
 
 def cancelar():
-    # Cancelar la operación y deshabilitar botones
+    # abort anything and restore ui
     btn_nuevo.config(state=tk.NORMAL)
     btn_editar.config(state=tk.NORMAL)
     btn_eliminar.config(state=tk.NORMAL)
     btn_guardar.config(state=tk.DISABLED)
     btn_cancelar.config(state=tk.DISABLED)
 
-    # Limpiar campos y deshabilitar la edición
     limpiar_campos()
 
 def limpiar_campos():
@@ -198,12 +189,12 @@ def limpiar_campos():
     entry_editorial.config(state=tk.DISABLED)
     combo_clasificacion.config(state=tk.DISABLED)
 
-# Configuración de la ventana principal
+# main window setup
 root = tk.Tk()
 root.title("Sistema de Gestión de Libros")
 root.geometry("400x300")
 
-# Crear etiquetas y campos de entrada
+# create ui
 label_search = tk.Label(root, text="Ingrese ID a buscar:")
 label_search.grid(row=0, column=0, padx=10, pady=10)
 
@@ -248,7 +239,7 @@ combo_clasificacion = ttk.Combobox(root, values=["A", "B", "C", "D"])
 combo_clasificacion.grid(row=5, column=1, padx=10, pady=5)
 combo_clasificacion.config(state=tk.DISABLED)
 
-# Crear botones
+# buttons
 btn_nuevo = tk.Button(root, text="Nuevo", command=nuevo)
 btn_nuevo.grid(row=6, column=0, padx=5, pady=10)
 
@@ -266,5 +257,4 @@ btn_editar.grid(row=7, column=0, padx=5, pady=10)
 btn_eliminar = tk.Button(root, text="Eliminar", command=eliminar)
 btn_eliminar.grid(row=7, column=1, padx=5, pady=10)
 
-# Iniciar el bucle principal de la ventana
 root.mainloop()

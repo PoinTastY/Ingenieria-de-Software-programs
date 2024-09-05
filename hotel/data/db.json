@@ -1,0 +1,39 @@
+{
+    "clientes": [
+        {
+            "id": 1,
+            "nombre": "Juan P\u00c3\u00a9rez",
+            "direccion": "Calle 123",
+            "telefono": "123456789",
+            "email": "correo@zzz.com"
+        }
+    ],
+    "reservaciones": [
+        {
+            "id": 1,
+            "id_cliente": 1,
+            "id_habitacion": 10,
+            "fecha_reservacion": "2024-09-01",
+            "fecha_salida": "2024-09-03",
+            "hora_reservacion": "12:00:00",
+            "costo": 100
+        }
+    ],
+    "habitaciones": [
+        {
+            "id": 10,
+            "numero_habitacion": "101",
+            "estado": "Libre"
+        },
+        {
+            "id": 11,
+            "numero_habitacion": "102",
+            "estado": "Libre"
+        }
+    ],
+    "indices": {
+        "clientes": 1,
+        "reservaciones": 1,
+        "habitaciones": 11
+    }
+}

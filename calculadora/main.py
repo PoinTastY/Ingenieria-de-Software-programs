@@ -66,8 +66,11 @@ class App (tk.Tk):
 
     def btnRootClicked(self):
         value = self.get_current_value()
-        result = sqrt(value)
-        self.set_display_value(result)
+        if(not(value < 0)):
+            result = sqrt(value)
+            self.set_display_value(result)
+        else:
+            self.set_display_value(0)
 
     def btnNotClicked(self):
         value = self.get_current_value()
@@ -146,10 +149,23 @@ class App (tk.Tk):
                 messagebox.showinfo("Resultado", "21")
                 self.btnCEClicked()
                 return
+            validate_percentage = self.display.get()
+
+            if '%' in validate_percentage:
+                try:
+                    parte, total = map(float, validate_percentage.replace('%', '/').split('/'))
+                    print(f"parte = {parte}, total: {total}")
+                    resultado = (parte / 100) * total
+                    self.set_display_value(resultado)
+                    self.update_conversion(resultado)
+                    return
+                except Exception as e:
+                    print(f"Error en porcentaje: {e}")
             result = eval(self.display.get())
             self.set_display_value(result)
             self.update_conversion(result)
         except Exception as e:
+            print(f"{e}")
             self.display.delete(0, tk.END)
             self.display.insert(tk.END, "Syntax Error")
 
@@ -162,7 +178,7 @@ class App (tk.Tk):
     def set_display_value(self, value):
         self.display.delete(0, tk.END)
         self.display.insert(tk.END, str(value))
-        self.update_conversion(float(value))
+        self.update_conversion(int(value))
 
 
     def clear_labels(self):

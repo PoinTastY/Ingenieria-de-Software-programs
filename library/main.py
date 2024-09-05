@@ -235,7 +235,7 @@ entry_editorial.config(state=tk.DISABLED)
 label_clasificacion = tk.Label(root, text="Clasificación:")
 label_clasificacion.grid(row=5, column=0, padx=10, pady=5)
 
-combo_clasificacion = ttk.Combobox(root, values=["A", "B", "C", "D"])
+combo_clasificacion = ttk.Combobox(root, values=["Cuento", "Novela", "Ensayo", "Tesis"])
 combo_clasificacion.grid(row=5, column=1, padx=10, pady=5)
 combo_clasificacion.config(state=tk.DISABLED)
 

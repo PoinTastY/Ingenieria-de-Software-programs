@@ -46,7 +46,7 @@ class Usuarios(tk.Toplevel):
         self.btn_cancelar = tk.Button(self, text="Cancelar", command=self.cancelar)
         self.btn_cancelar.grid(row=6, column=2, padx=10, pady=10)
 
-        self.btn_editar = tk.Button(self, text="Editar", state=tk.DISABLED)
+        self.btn_editar = tk.Button(self, text="Editar", state=tk.DISABLED, command=self.editar_usuario)
         self.btn_editar.grid(row=6, column=3, padx=10, pady=10)
 
     def cancelar(self):
@@ -78,8 +78,8 @@ class Usuarios(tk.Toplevel):
         try:
             usuario = self.db_repo.buscar_usuario(id_usuario)
             if usuario:
-                self.limpiar_campos(self.entry_buscar_id, self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña)
                 self.habilitar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña, self.combo_perfil)
+                self.limpiar_campos(self.entry_buscar_id, self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña)
                 self.entry_id_usuario.insert(0, usuario.id)
                 self.entry_nombre_usuario.insert(0, usuario.nombre)
                 self.entry_contraseña.insert(0, usuario.password)
@@ -94,11 +94,17 @@ class Usuarios(tk.Toplevel):
             messagebox.showerror("Error", "Error al buscar usuario. ({})".format(e))
 
     def guardar_usuario(self):
+        id_usuario = self.entry_id_usuario.get()
         user_name = self.entry_nombre_usuario.get()
         password = self.entry_contraseña.get()
         perfil = self.combo_perfil.get()
         try:
-            self.db_repo.guardar_usuario(nombre=user_name, password=password, perfil=perfil)
+            self.db_repo.guardar_usuario(id_usuario=id_usuario, nombre=user_name, password=password, perfil=perfil)
             messagebox.showinfo("Información", "Usuario guardado correctamente.")
         except Exception as e:
             messagebox.showerror("Error", "Error al guardar usuario. ({})".format(e))
+    
+    def editar_usuario(self):
+        self.habilitar_campos(self.entry_nombre_usuario, self.entry_contraseña, self.combo_perfil, self.btn_guardar)
+        self.deshabilitar_campos(self.btn_editar, self.btn_nuevo, self.entry_id_usuario)
+        self.entry_nombre_usuario.focus_set()

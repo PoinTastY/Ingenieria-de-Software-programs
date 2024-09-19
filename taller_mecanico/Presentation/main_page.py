@@ -51,7 +51,7 @@ class MainPage(tk.Tk):
                 self.btn_usuarios.config(state=tk.DISABLED)
                 self.btn_clientes.config(state=tk.NORMAL)
                 self.btn_autos.config(state=tk.NORMAL)
-                self.btn_partes.config(state=tk.DISABLED)
+                self.btn_partes.config(state=tk.NORMAL)
                 self.btn_reparaciones.config(state=tk.DISABLED)
 
             elif(self.user.perfil == "Mecanico"):

@@ -61,8 +61,20 @@ class DBRepo:
             user = Usuario(id=user[0], nombre=user[1], password=user[2], perfil=user[3])
             return user
         else:
-            raise Exception("Usuario o contraseña incorrecta")\
+            raise Exception("Usuario o contraseña incorrecta")
+            
     
+    def borrar_usuario(self, id_usuario : int) -> None:
+        try:
+            user_to_delete = self.buscar_usuario(id_usuario)
+            if(user_to_delete != None):
+                self.cursor.execute("DELETE FROM usuarios WHERE id = %s", (id_usuario))
+                self.conn.commit()
+            else:
+                raise Exception("Parece que el usuario a eliminar no se encontro en la db")
+        except:
+            raise
+        
     
     def __del__(self):
         self.cursor.close()

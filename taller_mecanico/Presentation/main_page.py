@@ -78,7 +78,7 @@ class MainPage(tk.Tk):
         if self.view_instance:
             self.view_instance.destroy()
         
-        self.view_instance = view_class(self.db_repo, self)
+        self.view_instance = view_class(self.db_repo, self, self.user)
         self.view_instance.protocol("WM_DELETE_WINDOW", self.on_closing)
 
 

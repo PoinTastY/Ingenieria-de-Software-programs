@@ -2,10 +2,12 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 
 from Data.db_repo import DBRepo
+from Domain.Entities.usuario import Usuario
 
 class Usuarios(tk.Toplevel):
-    def __init__(self, db_repo : DBRepo, main_page):
+    def __init__(self, db_repo : DBRepo, main_page, user : Usuario):
         super().__init__()
+        self.user = user
         self.db_repo = db_repo
         self.title("Gestión de Usuarios")
         self.geometry("450x400")
@@ -48,6 +50,24 @@ class Usuarios(tk.Toplevel):
 
         self.btn_editar = tk.Button(self, text="Editar", state=tk.DISABLED, command=self.editar_usuario)
         self.btn_editar.grid(row=6, column=3, padx=10, pady=10)
+    
+        self.btn_borrar = tk.Button(self, text="Borrar", state=tk.DISABLED, command=self.borrar_usuario)
+        self.btn_borrar.grid(row=7, column=0, padx=10, pady=10)
+
+
+    def borrar_usuario(self):
+        try:
+            id = self.entry_id_usuario.get()
+            self.db_repo.borrar_usuario(id)
+            messagebox.showinfo("Exito", f"Se borro al usuario con id: {id}")
+        except Exception as e:
+            messagebox.showerror("Error", "Error eliminando usuario: {}".format(e))
+        finally:
+            self.habilitar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña, self.btn_nuevo, self.btn_cancelar)
+            self.limpiar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña)
+            self.combo_perfil.set("")
+            self.deshabilitar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña, self.btn_borrar, self.btn_editar, self.btn_guardar)
+
 
     def cancelar(self):
         self.destroy()
@@ -86,7 +106,7 @@ class Usuarios(tk.Toplevel):
                 self.combo_perfil.set(usuario.perfil)
                 self.deshabilitar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña, self.combo_perfil,
                                          self.btn_guardar, self.btn_nuevo)
-                self.habilitar_campos(self.btn_editar, self.btn_cancelar)
+                self.habilitar_campos(self.btn_editar, self.btn_cancelar, self.btn_borrar)
 
             else:
                 messagebox.showinfo("Información", "Usuario no encontrado")
@@ -103,6 +123,8 @@ class Usuarios(tk.Toplevel):
             messagebox.showinfo("Información", "Usuario guardado correctamente.")
         except Exception as e:
             messagebox.showerror("Error", "Error al guardar usuario. ({})".format(e))
+        finally:
+            self.habilitar_campos(self.btn_borrar)
     
     def editar_usuario(self):
         self.habilitar_campos(self.entry_nombre_usuario, self.entry_contraseña, self.combo_perfil, self.btn_guardar)

@@ -12,6 +12,7 @@ class DBRepo:
         
         self.cursor = self.conn.cursor()
 
+
     def obtener_siguiente_id(self) -> int:
         try:
             self.cursor.execute("SELECT MAX(id) FROM usuarios")
@@ -19,6 +20,7 @@ class DBRepo:
             return id + 1
         except Exception as e:
             raise e
+
 
     def buscar_usuario(self, id_usuario) -> Usuario:
         try:
@@ -30,13 +32,13 @@ class DBRepo:
         except Exception as e:
             raise e
 
+
     def guardar_usuario(self,  nombre : str, password : str, perfil : str) -> None:
         try:
             self.cursor.execute("INSERT INTO usuarios (nombre, password, perfil) VALUES (%s, %s, %s)", (nombre, password, perfil))
             self.conn.commit()
         except Exception as e:
             raise e
-        
 
 
     def login(self, usuario, contraseña) -> Usuario:
@@ -47,6 +49,7 @@ class DBRepo:
             return user
         else:
             raise Exception("Usuario o contraseña incorrecta")\
+    
     
     def __del__(self):
         self.cursor.close()

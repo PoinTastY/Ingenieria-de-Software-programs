@@ -1,4 +1,5 @@
 import tkinter as tk
+<<<<<<< HEAD
 from tkinter import ttk, messagebox
 
 from Data.db_repo import DBRepo
@@ -59,4 +60,3 @@ class Clientes(tk.Tk):
     def guardar_cliente(self, id_cliente, nombre_usuario, nombre_cliente, telefono):
         
 
-    

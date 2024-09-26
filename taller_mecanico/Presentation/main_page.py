@@ -3,6 +3,7 @@ import tkinter as tk
 
 from Data.db_repo import DBRepo
 from Presentation.usuarios import Usuarios
+from Presentation.clientes import Clientes
 from Domain.Entities.usuario import Usuario
 
 class MainPage(tk.Tk):
@@ -24,7 +25,7 @@ class MainPage(tk.Tk):
         self.btn_usuarios = tk.Button(self.botones_frame, text="Usuarios", command=self.ventana_usuarios)
         self.btn_usuarios.pack(pady=10)
 
-        self.btn_clientes = tk.Button(self.botones_frame, text="Clientes")
+        self.btn_clientes = tk.Button(self.botones_frame, text="Clientes", command=self.ventana_clientes)
         self.btn_clientes.pack(pady=10)
         
 
@@ -73,12 +74,16 @@ class MainPage(tk.Tk):
         self.withdraw()
         self.open_view(Usuarios)
 
+    def ventana_clientes(self):
+        self.withdraw()
+        self.open_view(Clientes)
+
 
     def open_view(self, view_class):
         if self.view_instance:
             self.view_instance.destroy()
         
-        self.view_instance = view_class(self.db_repo, self)
+        self.view_instance = view_class(self.db_repo, self, self.user)
         self.view_instance.protocol("WM_DELETE_WINDOW", self.on_closing)
 
 

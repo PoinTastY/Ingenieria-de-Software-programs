@@ -6,7 +6,7 @@ class DBRepo:
     def __init__(self):
         self.conn = psycopg2.connect(database = "taller_mecanico",
                                     user = "admin",
-                                    host= '192.168.3.138',
+                                    host= 'localhost',
                                     password = "csisgod69",
                                     port = 5432)
         
@@ -29,13 +29,26 @@ class DBRepo:
             if user:
                 user = Usuario(id=user[0], nombre=user[1], password=user[2], perfil=user[3])
                 return user
+            else:
+                return None
         except Exception as e:
             raise e
 
 
-    def guardar_usuario(self,  nombre : str, password : str, perfil : str) -> None:
+    def guardar_usuario(self, id_usuario : str, nombre : str, password : str, perfil : str) -> None:
         try:
+            #validate if user exists, if so, edit it instead of creating a new one
+            if(self.buscar_usuario(id_usuario)):
+                self.editar_usuario(id_usuario, nombre, password, perfil)
+                return
             self.cursor.execute("INSERT INTO usuarios (nombre, password, perfil) VALUES (%s, %s, %s)", (nombre, password, perfil))
+            self.conn.commit()
+        except Exception as e:
+            raise e
+        
+    def editar_usuario(self, id_usuario : int, nombre : str, password : str, perfil : str) -> None:
+        try:
+            self.cursor.execute("UPDATE usuarios SET nombre = %s, password = %s, perfil = %s WHERE id = %s", (nombre, password, perfil, id_usuario))
             self.conn.commit()
         except Exception as e:
             raise e
@@ -48,8 +61,20 @@ class DBRepo:
             user = Usuario(id=user[0], nombre=user[1], password=user[2], perfil=user[3])
             return user
         else:
-            raise Exception("Usuario o contraseña incorrecta")\
+            raise Exception("Usuario o contraseña incorrecta")
+            
     
+    def borrar_usuario(self, id_usuario : int) -> None:
+        try:
+            user_to_delete = self.buscar_usuario(id_usuario)
+            if(user_to_delete != None):
+                self.cursor.execute("DELETE FROM usuarios WHERE id = %s", (id_usuario))
+                self.conn.commit()
+            else:
+                raise Exception("Parece que el usuario a eliminar no se encontro en la db")
+        except:
+            raise
+        
     
     def __del__(self):
         self.cursor.close()

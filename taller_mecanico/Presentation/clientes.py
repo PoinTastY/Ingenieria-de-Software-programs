@@ -1,5 +1,4 @@
 import tkinter as tk
-<<<<<<< HEAD
 from tkinter import ttk, messagebox
 
 from Data.db_repo import DBRepo
@@ -55,8 +54,21 @@ class Clientes(tk.Tk):
             campo.delete(0, tk.END)
 
     def buscar_cliente(self, id_cliente):
-        pass
+        try:
+            cliente = self.db_repo.buscar_cliente(id_cliente)
+            if cliente:
+                self.entry_id_cliente.insert(0, cliente.id)
+                self.entry_nombre_usuario.insert(0, cliente.nombre_usuario)
+                self.entry_nombre_cliente.insert(0, cliente.nombre_cliente)
+                self.entry_telefono.insert(0, cliente.telefono)
+        except Exception as e:
+            messagebox.showerror("Error", "Error al buscar cliente. ({})".format(e))
 
     def guardar_cliente(self, id_cliente, nombre_usuario, nombre_cliente, telefono):
+        try:
+            self.db_repo.guardar_cliente(nombre_usuario, nombre_cliente, telefono)
+
+        except Exception as e:
+            messagebox.showerror("Error", "Error al guardar cliente. ({})".format(e))
         
 

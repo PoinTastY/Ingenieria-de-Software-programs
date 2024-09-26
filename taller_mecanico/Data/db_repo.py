@@ -1,6 +1,7 @@
 import psycopg2
 
 from Domain.Entities.usuario import Usuario
+from Domain.Entities.cliente import Cliente
 
 class DBRepo:
     def __init__(self):
@@ -13,7 +14,7 @@ class DBRepo:
         self.cursor = self.conn.cursor()
 
 
-    def obtener_siguiente_id(self) -> int:
+    def obtener_siguiente_id_usuario(self) -> int:
         try:
             self.cursor.execute("SELECT MAX(id) FROM usuarios")
             id = self.cursor.fetchone()[0]
@@ -52,8 +53,44 @@ class DBRepo:
             self.conn.commit()
         except Exception as e:
             raise e
-
-
+        
+    def obtener_siguiente_id_clientes(self) -> int:
+        try:
+            self.cursor.execute("SELECT MAX(id) FROM clientes")
+            id = self.cursor.fetchone()[0]
+            return id + 1
+        except Exception as e:
+            raise e
+        
+    def buscar_cliente(self, id_cliente) -> Cliente:
+        try:
+            self.cursor.execute("SELECT * FROM clientes WHERE id = %s", (id_cliente,))
+            cliente = self.cursor.fetchone()
+            if cliente:
+                cliente = Cliente(id=cliente[0], nombre=cliente[1], telefono=cliente[2])
+                return cliente
+            else:
+                return None
+        except Exception as e:
+            raise e
+        
+    def guardar_cliente(self, id_cliente : str, nombre : str, telefono : str) -> None:
+        try:
+            if(self.buscar_cliente(id_cliente)):
+                self.editar_cliente(id_cliente, nombre, telefono)
+                return
+            self.cursor.execute("INSERT INTO clientes (nombre, telefono) VALUES (%s, %s)", (nombre, telefono))
+            self.conn.commit()
+        except Exception as e:
+            raise e
+        
+    def editar_cliente(self, id_cliente : int, nombre : str, telefono : str) -> None:
+        try:
+            self.cursor.execute("UPDATE clientes SET nombre = %s, telefono = %s WHERE id = %s", (nombre, telefono, id_cliente))
+            self.conn.commit()
+        except Exception as e:
+            raise e
+    
     def login(self, usuario, contraseña) -> Usuario:
         self.cursor.execute("SELECT * FROM usuarios WHERE nombre = %s AND password = %s", (usuario, contraseña))
         user = self.cursor.fetchone()

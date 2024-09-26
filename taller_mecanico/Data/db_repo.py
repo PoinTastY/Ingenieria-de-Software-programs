@@ -57,7 +57,10 @@ class DBRepo:
     def obtener_siguiente_id_clientes(self) -> int:
         try:
             self.cursor.execute("SELECT MAX(id) FROM clientes")
+
             id = self.cursor.fetchone()[0]
+            if(id == None):
+                return 1
             return id + 1
         except Exception as e:
             raise e
@@ -74,19 +77,19 @@ class DBRepo:
         except Exception as e:
             raise e
         
-    def guardar_cliente(self, id_cliente : str, nombre : str, telefono : str) -> None:
+    def guardar_cliente(self,id : int, nombre : str, apellido : str, telefono : str) -> None:
         try:
-            if(self.buscar_cliente(id_cliente)):
-                self.editar_cliente(id_cliente, nombre, telefono)
+            if(self.buscar_cliente(id)):
+                self.editar_cliente(id, nombre, apellido, telefono)
                 return
-            self.cursor.execute("INSERT INTO clientes (nombre, telefono) VALUES (%s, %s)", (nombre, telefono))
+            self.cursor.execute("INSERT INTO clientes (nombre, apellido, telefono) VALUES (%s, %s, %s)", (nombre, apellido, telefono))
             self.conn.commit()
         except Exception as e:
             raise e
         
-    def editar_cliente(self, id_cliente : int, nombre : str, telefono : str) -> None:
+    def editar_cliente(self, id_cliente : int, nombre : str, apellido : str,  telefono : str) -> None:
         try:
-            self.cursor.execute("UPDATE clientes SET nombre = %s, telefono = %s WHERE id = %s", (nombre, telefono, id_cliente))
+            self.cursor.execute("UPDATE clientes SET nombre = %s, apellido = %s, telefono = %s WHERE id = %s", (nombre, apellido, telefono, id_cliente))
             self.conn.commit()
         except Exception as e:
             raise e

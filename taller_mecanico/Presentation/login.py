@@ -31,10 +31,9 @@ class Login(tk.Tk):
             appuser = self.db_repo.login(user, password)
             if(appuser):
                 self.withdraw()
-                mainpage = MainPage(self.db_repo, appuser)
-                mainpage.mainloop()
-                print("mainpage closed")
+                self.mainpage = MainPage(self.db_repo, appuser, self)
 
+                self.entry_password.delete(0, tk.END)
             else:
                 self.entry_usuario.delete(0, tk.END)
                 self.entry_password.delete(0, tk.END)
@@ -42,4 +41,3 @@ class Login(tk.Tk):
 
         except Exception as e:
             messagebox.showerror("Error", "Usuario o contraseña incorrecta. ({})".format(e))
-        

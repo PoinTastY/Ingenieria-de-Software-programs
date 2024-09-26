@@ -5,10 +5,9 @@ from Data.db_repo import DBRepo
 from Presentation.usuarios import Usuarios
 from Presentation.clientes import Clientes
 from Domain.Entities.usuario import Usuario
-from Presentation.login import Login
 
 class MainPage(tk.Tk):
-    def __init__(self, db_repo : DBRepo, user : Usuario, login = Login):
+    def __init__(self, db_repo : DBRepo, user : Usuario, login):
         super().__init__()
         self.db_repo = db_repo
         self.user = user
@@ -47,7 +46,8 @@ class MainPage(tk.Tk):
         self.update_user()
 
     def quit(self) -> None:
-        exit(0)
+        self.destroy()
+        self.login.deiconify()
         
     def update_user(self):
         if(self.user.perfil != "Admin"):
@@ -94,5 +94,3 @@ class MainPage(tk.Tk):
         if self.view_instance:
             self.view_instance.destroy()
             self.view_instance = None
-        self.destroy()
-        self.login.deiconify()

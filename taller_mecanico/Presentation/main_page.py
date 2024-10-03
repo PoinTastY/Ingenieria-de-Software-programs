@@ -16,7 +16,7 @@ class MainPage(tk.Tk):
         self.db_repo = db_repo
         self.user = user
         self.title("Taller Mecanico")
-        self.geometry("100x300")
+        self.geometry("300x300")
 
         self.login = login
 
@@ -26,7 +26,7 @@ class MainPage(tk.Tk):
 
     def build_mainpage(self):
         self.botones_frame = tk.Frame(self)
-        self.botones_frame.pack(side=tk.LEFT, fill=tk.Y)
+        self.botones_frame.pack(fill=tk.Y)
 
         self.btn_usuarios = tk.Button(self.botones_frame, text="Usuarios", command=self.ventana_usuarios)
         self.btn_usuarios.pack(pady=10, padx=20)
@@ -59,7 +59,7 @@ class MainPage(tk.Tk):
                 self.btn_usuarios.config(state=tk.DISABLED)
                 self.btn_clientes.config(state=tk.NORMAL)
                 self.btn_autos.config(state=tk.NORMAL)
-                self.btn_partes.config(state=tk.NORMAL)
+                self.btn_partes.config(state=tk.DISABLED)
                 self.btn_reparaciones.config(state=tk.DISABLED)
 
             elif(self.user.perfil == "Mecanico"):

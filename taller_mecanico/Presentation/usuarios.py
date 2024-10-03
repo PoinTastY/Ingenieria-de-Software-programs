@@ -75,7 +75,7 @@ class Usuarios(tk.Toplevel):
         try:
             self.limpiar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña)
             self.habilitar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña, self.combo_perfil, self.btn_guardar)
-            self.entry_id_usuario.insert(0, self.db_repo.obtener_siguiente_id())
+            self.entry_id_usuario.insert(0, self.db_repo.obtener_siguiente_id_usuario())
             self.deshabilitar_campos(self.entry_id_usuario, self.btn_nuevo, self.btn_editar)
         except Exception as e:
             messagebox.showerror("Error", "Error al obtener siguiente ID. ({})".format(e))

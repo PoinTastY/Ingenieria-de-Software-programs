@@ -4,5 +4,4 @@ class Cliente:
         self.nombre = nombre
         self.apellido = apellido
         self.telefono = telefono
-
-        
+      

@@ -9,7 +9,7 @@ class Login(tk.Tk):
         super().__init__()
         self.db_repo = db_repo
         self.title("Login")
-        self.geometry("400x400")  # Ajustar tamaño
+        self.geometry("200x200")  # Ajustar tamaño
 
         tk.Label(self, text="Usuario:").pack(padx=10, pady=5)
         self.entry_usuario = tk.Entry(self)
@@ -32,6 +32,8 @@ class Login(tk.Tk):
             if(appuser):
                 self.withdraw()
                 self.mainpage = MainPage(self.db_repo, appuser, self)
+                self.mainpage.protocol("WM_DELETE_WINDOW", self.on_closing)
+
 
                 self.entry_password.delete(0, tk.END)
             else:
@@ -41,3 +43,7 @@ class Login(tk.Tk):
 
         except Exception as e:
             messagebox.showerror("Error", "Usuario o contraseña incorrecta. ({})".format(e))
+    
+    def on_closing(self):
+        self.mainpage.destroy()
+        self.deiconify()

@@ -4,6 +4,10 @@ import tkinter as tk
 from Data.db_repo import DBRepo
 from Presentation.usuarios import Usuarios
 from Presentation.clientes import Clientes
+from Presentation.autos import Autos
+from Presentation.partes import Partes
+from Presentation.reparaciones import Reparaciones
+
 from Domain.Entities.usuario import Usuario
 
 class MainPage(tk.Tk):
@@ -12,7 +16,7 @@ class MainPage(tk.Tk):
         self.db_repo = db_repo
         self.user = user
         self.title("Taller Mecanico")
-        self.geometry("600x400")
+        self.geometry("100x300")
 
         self.login = login
 
@@ -25,23 +29,23 @@ class MainPage(tk.Tk):
         self.botones_frame.pack(side=tk.LEFT, fill=tk.Y)
 
         self.btn_usuarios = tk.Button(self.botones_frame, text="Usuarios", command=self.ventana_usuarios)
-        self.btn_usuarios.pack(pady=10)
+        self.btn_usuarios.pack(pady=10, padx=20)
 
         self.btn_clientes = tk.Button(self.botones_frame, text="Clientes", command=self.ventana_clientes)
-        self.btn_clientes.pack(pady=10)
+        self.btn_clientes.pack(pady=10, padx=20)
         
 
-        self.btn_autos = tk.Button(self.botones_frame, text="Autos")
-        self.btn_autos.pack(pady=10)
+        self.btn_autos = tk.Button(self.botones_frame, text="Autos", command=self.ventana_autos)
+        self.btn_autos.pack(pady=10, padx=20)
 
-        self.btn_reparaciones = tk.Button(self.botones_frame, text="Reparaciones")
-        self.btn_reparaciones.pack(pady=10)
+        self.btn_reparaciones = tk.Button(self.botones_frame, text="Reparaciones", command=self.ventana_reparaciones)
+        self.btn_reparaciones.pack(pady=10, padx=20)
 
-        self.btn_partes = tk.Button(self.botones_frame, text="Partes")
-        self.btn_partes.pack(pady=10)
+        self.btn_partes = tk.Button(self.botones_frame, text="Partes", command=self.ventana_partes)
+        self.btn_partes.pack(pady=10, padx=20)
 
         self.btn_salir = tk.Button(self.botones_frame, text="Salir", command=self.quit)
-        self.btn_salir.pack(pady=10)
+        self.btn_salir.pack(pady=10, padx=20)
 
         self.update_user()
 
@@ -81,16 +85,23 @@ class MainPage(tk.Tk):
         self.withdraw()
         self.open_view(Clientes)
 
+    def ventana_autos(self):
+        self.withdraw()
+        self.open_view(Autos)
+
+    def ventana_reparaciones(self):
+        self.withdraw()
+        self.open_view(Reparaciones)
+
+    def ventana_partes(self):
+        self.withdraw()
+        self.open_view(Partes)
 
     def open_view(self, view_class):
-        if self.view_instance:
-            self.view_instance.destroy()
         
         self.view_instance = view_class(self.db_repo, self, self.user)
         self.view_instance.protocol("WM_DELETE_WINDOW", self.on_closing)
 
-
     def on_closing(self):
-        if self.view_instance:
-            self.view_instance.destroy()
-            self.view_instance = None
+        self.view_instance.destroy()
+        self.deiconify()

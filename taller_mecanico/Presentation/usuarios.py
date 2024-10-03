@@ -10,7 +10,7 @@ class Usuarios(tk.Toplevel):
         self.user = user
         self.db_repo = db_repo
         self.title("Gestión de Usuarios")
-        self.geometry("450x400")
+        self.geometry("450x300")
 
         self.mainwindow = main_page
 
@@ -54,7 +54,6 @@ class Usuarios(tk.Toplevel):
         self.btn_borrar = tk.Button(self, text="Borrar", state=tk.DISABLED, command=self.borrar_usuario)
         self.btn_borrar.grid(row=7, column=0, padx=10, pady=10)
 
-
     def borrar_usuario(self):
         try:
             id = self.entry_id_usuario.get()
@@ -67,7 +66,6 @@ class Usuarios(tk.Toplevel):
             self.limpiar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña)
             self.combo_perfil.set("")
             self.deshabilitar_campos(self.entry_id_usuario, self.entry_nombre_usuario, self.entry_contraseña, self.btn_borrar, self.btn_editar, self.btn_guardar)
-
 
     def cancelar(self):
         self.destroy()

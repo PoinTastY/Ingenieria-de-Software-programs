@@ -10,7 +10,7 @@ class Clientes(tk.Tk):
         self.mainwindow = main_page
         self.user = user
         self.title("Clientes")
-        self.geometry("450x400")
+        self.geometry("460x280")
         self.build_ui()
         
     def build_ui(self):
@@ -44,8 +44,11 @@ class Clientes(tk.Tk):
         self.btn_cancelar = tk.Button(self, text="Cancel", command=self.cancelar)
         self.btn_cancelar.grid(row=5, column=2, padx=10, pady=10)
 
-        self.btn_editar = tk.Button(self, state=tk.DISABLED, text="Edit")
+        self.btn_editar = tk.Button(self, state=tk.DISABLED, text="Edit", command=self.editar_cliente)
         self.btn_editar.grid(row=5, column=3, padx=10, pady=10)
+
+        self.btn_eliminar = tk.Button(self, state=tk.DISABLED, text="Delete", command=self.eliminar_cliente)
+        self.btn_eliminar.grid(row=5, column=4, padx=10, pady=10)
 
     def cancelar(self):
         self.destroy()
@@ -73,20 +76,43 @@ class Clientes(tk.Tk):
                 self.habilitar_deshabilitar_campos(self.entry_id_cliente, self.entry_nombre_usuario,
                                                                               self.entry_nombre_cliente, self.entry_telefono, state=tk.DISABLED)
                 
+                self.habilitar_deshabilitar_campos(self.btn_eliminar, state=tk.NORMAL)
         except Exception as e:
             messagebox.showerror("Error", "Error al buscar cliente. ({})".format(e))
+
+    def eliminar_cliente(self):
+        try:
+            self.db_repo.borrar_cliente(self.entry_id_cliente.get())
+            messagebox.showinfo("Cliente eliminado", "Cliente eliminado correctamente")
+            self.limpiar_campos(self.entry_id_cliente, self.entry_nombre_usuario, self.entry_nombre_cliente, self.entry_telefono)
+            self.habilitar_deshabilitar_campos(self.entry_id_cliente, self.entry_nombre_usuario, self.entry_nombre_cliente, self.entry_telefono, self.btn_editar, self.btn_eliminar, state=tk.DISABLED)
+        except Exception as e:
+            messagebox.showerror("Error", "Error al eliminar cliente. ({})".format(e))
+
+    def editar_cliente(self):
+        self.habilitar_deshabilitar_campos(self.entry_nombre_usuario, self.entry_nombre_cliente, self.entry_telefono, self.btn_guardar, self.btn_eliminar, state=tk.NORMAL)
+        self.habilitar_deshabilitar_campos(self.btn_nuevo, self.entry_id_cliente, state=tk.DISABLED)
 
     def nuevo_cliente(self):
         self.habilitar_deshabilitar_campos(self.entry_id_cliente, self.entry_nombre_usuario,
                                                                               self.entry_nombre_cliente, self.entry_telefono, self.btn_guardar, state=tk.NORMAL )
         self.entry_id_cliente.delete(0, tk.END)
         self.entry_id_cliente.insert(0, self.db_repo.obtener_siguiente_id_clientes())
-        self.habilitar_deshabilitar_campos(self.btn_nuevo, state=tk.DISABLED)
+        self.habilitar_deshabilitar_campos(self.btn_nuevo, self.entry_id_cliente, self.btn_eliminar, state=tk.DISABLED)
 
     def guardar_cliente(self,id, nombre, apellido, telefono):
         try:
-            self.db_repo.guardar_cliente(id, nombre, apellido, telefono)
-
+            #validate if telefono is a number
+            try:
+                int(telefono)
+            except:
+                messagebox.showerror("Error", "El telefono debe ser un numero")
+                return
+            self.db_repo.guardar_cliente(id=id, nombre=nombre, apellido=apellido, telefono=telefono)
+            messagebox.showinfo("Cliente guardado", "Cliente guardado correctamente")
+            self.habilitar_deshabilitar_campos(self.btn_nuevo, self.entry_id_cliente, state=tk.NORMAL)
+            self.limpiar_campos(self.entry_id_cliente, self.entry_nombre_usuario, self.entry_nombre_cliente, self.entry_telefono)
+            self.habilitar_deshabilitar_campos(self.entry_id_cliente, self.entry_nombre_usuario, self.entry_nombre_cliente, self.entry_telefono, self.btn_guardar, state=tk.DISABLE)
         except Exception as e:
             messagebox.showerror("Error", "Error al guardar cliente. ({})".format(e))
         

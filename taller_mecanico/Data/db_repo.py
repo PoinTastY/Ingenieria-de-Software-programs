@@ -314,6 +314,14 @@ class DBRepo:
             return cantidad
         except Exception as e:
             raise e
+
+    def obtener_costo_pieza(self, id_parte):
+        try:
+            self.cursor.execute("SELECT costo FROM partes WHERE id = %s", (id_parte))
+            costo = self.cursor.fetchone()[0]
+            return costo
+        except Exception as e:
+            raise e
         
     def agregar_det_rep_parte(self, id_reparacion, id_parte, cantidad) -> None:
         try:

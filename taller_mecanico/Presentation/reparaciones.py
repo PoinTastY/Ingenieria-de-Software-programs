@@ -164,6 +164,10 @@ class Reparaciones(tk.Tk):
 
     def agregar_pieza(self):
         try:
+            #si no hay id de reparacion, no se puede agregar piezas
+            if not self.entry_id_reparacion.get():
+                messagebox.showinfo("Información", "Primero busque una reparación")
+                return
             # Pedir el ID de la pieza
             pieza_id = simpledialog.askstring("Agregar Pieza", "Ingrese el ID de la pieza:")
             
@@ -189,14 +193,15 @@ class Reparaciones(tk.Tk):
     def quitar_pieza(self):
         # Eliminar la pieza seleccionada
         try:
+            if not self.entry_id_reparacion.get():
+                messagebox.showinfo("Información", "Primero busque una reparación")
+                return
             selected_item = self.tree_piezas.selection()
             if selected_item:
                 pieza_id = self.tree_piezas.item(selected_item)["values"][0]
                 self.db_repo.eliminar_det_rep_parte(self.entry_id_reparacion.get(), pieza_id)
                 self.tree_piezas.delete(selected_item)
-
                 self.calcular_total()
-
             else:
                 messagebox.showinfo("Información", "Seleccione una pieza para quitar")
         except Exception as e:
@@ -214,7 +219,8 @@ class Reparaciones(tk.Tk):
         total = 0
         for item in self.tree_piezas.get_children():
             pieza = self.tree_piezas.item(item)
-            total += self.db_repo.obtener_costo_pieza(pieza["values"][0]) * pieza["values"][2]
+            costo = float(self.db_repo.obtener_costo_pieza(pieza["values"][0]))
+            total += costo * pieza["values"][2]
 
         self.lbl_total.config(text="Total: ${}".format(total))
         

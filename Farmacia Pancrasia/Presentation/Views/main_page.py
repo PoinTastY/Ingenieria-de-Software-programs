@@ -20,7 +20,7 @@ class MainPage(tk.Tk):
         self.notebook = ttk.Notebook(self)
 
         #define tabs
-        self.ventas_tab = VentaTab(self.notebook)
+        self.ventas_tab = VentaTab(self.notebook, self.db_repo)
 
         #add tabs
         self.notebook.add(self.ventas_tab, text="Ventas")

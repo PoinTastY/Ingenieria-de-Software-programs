@@ -1,9 +1,12 @@
 import tkinter as tk
 
+from Interface.db_repo import DbRepo
+
 class VentaTab(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, db_repo : DbRepo):
         super().__init__(parent)
         self.parent = parent
+        self.db_repo = db_repo
         self.pack()
         self.build_ui()
 

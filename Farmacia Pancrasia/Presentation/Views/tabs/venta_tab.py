@@ -12,5 +12,7 @@ class VentaTab(tk.Frame):
 
     def build_ui(self):
         tk.Label(self, text="Venta").pack(padx=10, pady=5)
-        tk.Label(self, text="Cliente:").pack(padx=10, pady=5)
-        self.entry_cliente = tk.Entry(self)
+        self.label_codigo = tk.Label(self, text="Producto:")
+        self.label_codigo.pack(padx=10, pady=5)
+        self.entry_codigo = tk.Entry(self)
+        self.entry_codigo.pack(padx=10, pady=5)

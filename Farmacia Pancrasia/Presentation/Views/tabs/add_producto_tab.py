@@ -22,6 +22,7 @@ class AddProductoTab(tk.Frame):
         # Botón para buscar producto
         self.boton_buscar = tk.Button(self, text="Buscar", command=self.buscar_producto)
         self.boton_buscar.grid(row=0, column=2, padx=10, pady=10)
+        self.boton_buscar.bind("<Return>", self.buscar_producto)
         
         # Etiqueta y entrada para el precio
         self.label_descripcion = tk.Label(self, text="Descripcion:")

@@ -69,6 +69,22 @@ class VentaTab(tk.Frame):
             messagebox.showerror("Error", "Producto no encontrado")
             self.entry_codigo.delete(0, tk.END)
             self.entry_codigo.focus_set()
+        self.entry_cantidad.delete(0, tk.END)
+        self.entry_cantidad.insert(0, "1")
+    
+    def add_cuantity(self):
+        #if product is selected, update quantity
+        selected = self.tree_productos.selection()
+        if selected:
+            self.tree_productos.item(selected, values=(self.tree_productos.item(selected)["values"][0], self.tree_productos.item(selected)["values"][1], int(self.tree_productos.item(selected)["values"][2])+1))
+            self.label_total.config(text="Total: $"+str(self.get_total()))
+        else:
+            #icrement entry_cuantity
+            cuantity = int(self.entry_cantidad.get())
+            cuantity += 1
+            self.entry_cantidad.delete(0, tk.END)
+            self.entry_cantidad.insert(0, str(cuantity))
+
 
     def delete_item(self):
         selected = self.tree_productos.selection()

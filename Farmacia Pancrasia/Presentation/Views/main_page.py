@@ -14,7 +14,7 @@ class MainPage(tk.Tk):
         self.db_repo = db_repo
         self.user = user
         self.title("Taller Mecanico")
-        self.geometry("300x300")
+        self.geometry("670x500")
         self.login = login
         self.build_ui()
 
@@ -43,7 +43,12 @@ class MainPage(tk.Tk):
             self.add_producto_tab.clear_inputs()
             self.add_producto_tab.entry_codigo.delete(0, tk.END)
             self.add_producto_tab.entry_codigo.focus_set()
+
         if frame == self.ventas_tab:
             self.ventas_tab.entry_codigo.delete(0, tk.END)
             self.ventas_tab.entry_codigo.focus_set()
+        
+        if frame == self.usuarios_tab:
+            self.usuarios_tab.clear_inputs()
+            
 

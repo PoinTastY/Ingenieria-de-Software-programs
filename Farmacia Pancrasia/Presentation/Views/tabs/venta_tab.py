@@ -42,7 +42,6 @@ class VentaTab(tk.Frame):
         self.btn_pagar.grid(row=4, column=0, columnspan=7,padx=10, pady=5)
         self.btn_pagar.bind("<F12>", self.pay)
         self.entry_codigo.focus_set()
-        self.entry_codigo.bind("<Return>", self.buscar_producto)
     
     def buscar_producto(self, event):
         codigo = self.entry_codigo.get()
@@ -84,7 +83,6 @@ class VentaTab(tk.Frame):
             cuantity += 1
             self.entry_cantidad.delete(0, tk.END)
             self.entry_cantidad.insert(0, str(cuantity))
-
 
     def delete_item(self):
         selected = self.tree_productos.selection()

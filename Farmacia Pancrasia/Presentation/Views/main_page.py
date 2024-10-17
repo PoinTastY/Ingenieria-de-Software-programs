@@ -36,6 +36,17 @@ class MainPage(tk.Tk):
 
         self.notebook.bind("<<NotebookTabChanged>>", self.on_tab_change)
 
+        self.bind("<Return>", self.on_enter_pressed)
+
+
+    def on_enter_pressed(self, event):
+        selected_tab = self.notebook.select()
+        frame = self.notebook.nametowidget(selected_tab)
+        if frame == self.add_producto_tab:
+            self.add_producto_tab.buscar_producto(event)
+        if frame == self.ventas_tab:
+            self.ventas_tab.buscar_producto(event)
+
     def on_tab_change(self, event):
         selected_tab = self.notebook.select()
         frame = self.notebook.nametowidget(selected_tab)

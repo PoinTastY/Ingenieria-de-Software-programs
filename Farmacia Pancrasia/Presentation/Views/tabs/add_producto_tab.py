@@ -46,10 +46,7 @@ class AddProductoTab(tk.Frame):
         self.boton_agregar = tk.Button(self, text="Agregar Producto", state="disabled", command=self.create_product)
         self.boton_agregar.grid(row=4, columnspan=2, padx=10, pady=10)
 
-    def buscar_producto(self):
-
-        descripcion = self.entry_descripcion.get()
-
+    def buscar_producto(self, event):
         product = self.entry_codigo.get()
 
         if not product:

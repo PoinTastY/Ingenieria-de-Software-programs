@@ -219,6 +219,21 @@ class DbRepo:
         except (Exception, psycopg2.DatabaseError) as error:
             raise Exception(f"Error creando venta: {error}")
         
+    def create_compra(self, id_proveedor, id_usuario, referencia, fecha) -> int:
+        try:
+            
+            fecha = datetime.datetime.now()
+            self.cursor.execute("INSERT INTO compra (id_proveedor, id_usuario, fecha, referencia) VALUES (%s, %s, %s, %s)", (id_proveedor, id_usuario, fecha, referencia))
+            self.conn.commit()
+
+            #obtener el id de la venta
+            self.cursor.execute("SELECT MAX(id) FROM compra")
+            id_compra = self.cursor.fetchone()[0]
+            return id_compra
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error creando venta: {error}")
+        
 
         
     def create_detalle_venta(self, id_venta, id_producto, cantidad):
@@ -232,6 +247,22 @@ class DbRepo:
             self.conn.commit()
             #create detalle_venta
             self.cursor.execute("INSERT INTO venta_detalle (id_venta, id_producto, cantidad) VALUES (%s, %s, %s)", (id_venta, id_producto, cantidad))
+            self.conn.commit()
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error creando detalle de venta: {error}")
+        
+    def create_detalle_compra(self, id_venta, id_producto, cantidad):
+        try:
+            #discount stock
+            self.cursor.execute("SELECT stock FROM producto WHERE id = %s", (id_producto,))
+            stock = self.cursor.fetchone()[0]
+            if stock < cantidad:
+                raise Exception("No hay suficiente stock para el producto")
+            self.cursor.execute("UPDATE producto SET stock = %s WHERE id = %s", (stock + cantidad, id_producto))
+            self.conn.commit()
+            #create detalle_venta
+            self.cursor.execute("INSERT INTO compra_detalle (id_venta, id_producto, cantidad) VALUES (%s, %s, %s)", (id_venta, id_producto, cantidad))
             self.conn.commit()
 
         except (Exception, psycopg2.DatabaseError) as error:

@@ -2,6 +2,7 @@ import psycopg2
 
 from Domain.Entities.usuario import Usuario
 from Domain.Entities.producto import Producto
+from Domain.Entities.cliente import Cliente
 
 
 class DbRepo:
@@ -87,6 +88,68 @@ class DbRepo:
         if product:
             return product
         return None
+        
+    def obtener_siguiente_id_cliente(self):
+        # Obtiene el nombre de la secuencia asociada a la columna 'id' de la tabla 'cliente'
+        self.cursor.execute("SELECT pg_get_serial_sequence('cliente', 'id')")
+        secuencia = self.cursor.fetchone()[0]
+
+        # Consulta el siguiente valor proyectado de la secuencia
+        self.cursor.execute(f"SELECT last_value + 1 FROM {secuencia}")
+        siguiente_id = self.cursor.fetchone()[0]
+        return siguiente_id
+    
+    def buscar_cliente_por_nombre(self, nombre):
+        # Puedes usar una consulta SQL que filtre los clientes por nombre
+        consulta = "SELECT id, nombre, direccion, email, telefono FROM cliente WHERE nombre ILIKE %s"
+        self.cursor.execute(consulta, ('%' + nombre + '%',))
+        resultados = self.cursor.fetchall()
+        # Convertir los resultados en un formato más fácil de usar
+        return [(row[0], {'nombre': row[1], 'direccion': row[2], 'email': row[3], 'telefono': row[4]}) for row in resultados]
+    
+    def registrar_cliente(self, id, nombre, apellido, direccion, email, telefono):
+        # if the client exists, update it
+        self.cursor.execute("SELECT * FROM cliente WHERE id = %s", (id,))
+        cliente = self.cursor.fetchone()
+        if cliente:
+            self.editar_cliente(cliente[0], nombre, apellido, direccion, email, telefono)
+            return True
+        self.cursor.execute("INSERT INTO cliente ( nombre, apellido, direccion, email, telefono) VALUES (%s, %s, %s, %s, %s)", ( nombre, apellido, direccion, email, telefono))
+        self.conn.commit()
+        return True
+
+    def editar_cliente(self, id_cliente, nombre, apellido, direccion, email, telefono):
+        try:
+            self.cursor.execute("UPDATE cliente SET nombre = %s, apellido = %s, direccion = %s, email = %s, telefono = %s WHERE id = %s", (nombre, apellido, direccion, email, telefono, id_cliente))
+            self.conn.commit()
+            return True;
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error editando cliente: {error}")
+
+    def obtener_clientes(self) -> list:
+        clientes = []
+        try:
+            query = "SELECT id, nombre, apellido, direccion, email, telefono, puntos FROM cliente"
+            self.cursor.execute(query)
+            resultados = self.cursor.fetchall()
+            
+            # Procesa los resultados y crea objetos Cliente
+            for id_cliente, nombre, apellido, direccion, email, telefono, puntos in resultados:
+                cliente = Cliente(id=id_cliente, nombre=nombre, apellido=apellido, direccion=direccion, email=email, telefono=telefono, puntos=puntos)
+                clientes.append(cliente)
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error obteniendo clientes: {error}")
+        
+        return clientes
+    
+    def eliminar_cliente(self, id_cliente):
+        try:
+            self.cursor.execute("DELETE FROM cliente WHERE id = %s", (id_cliente,))
+            self.conn.commit()
+            return True
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error eliminando cliente: {error}")
 
     
     def __del__(self):

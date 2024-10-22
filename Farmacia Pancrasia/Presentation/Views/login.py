@@ -21,6 +21,7 @@ class Login(tk.Tk):
 
         self.btn_ingresar = tk.Button(self, text="Ingresar", command=self.iniciar_sesion)
         self.btn_ingresar.pack(pady=10)
+        self.entry_usuario.focus_set()
 
     def iniciar_sesion(self):
         try:
@@ -47,3 +48,4 @@ class Login(tk.Tk):
     def on_closing(self):
         self.mainpage.destroy()
         self.deiconify()
+        self.entry_usuario.focus_set()

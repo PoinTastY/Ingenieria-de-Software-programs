@@ -6,6 +6,7 @@ from Domain.Entities.usuario import Usuario
 from Presentation.Views.tabs.venta_tab import VentaTab
 from Presentation.Views.tabs.add_producto_tab import AddProductoTab
 from Presentation.Views.tabs.usuarios_tab import UsuariosTab
+from Presentation.Views.tabs.clientes_tab import ClientesTab
 
 
 class MainPage(tk.Tk):
@@ -25,11 +26,13 @@ class MainPage(tk.Tk):
         self.ventas_tab = VentaTab(self.notebook, self.db_repo)
         self.add_producto_tab = AddProductoTab(self.notebook, self.db_repo)
         self.usuarios_tab = UsuariosTab(self.notebook, self.db_repo)
+        self.clientes_tab = ClientesTab(self.notebook, self.db_repo)
 
         #add tabs
         self.notebook.add(self.ventas_tab, text="Ventas")
         self.notebook.add(self.add_producto_tab, text="Productos")
         self.notebook.add(self.usuarios_tab, text="Usuarios")
+        self.notebook.add(self.clientes_tab, text="Clientes")
 
         #finally pack  the notebook
         self.notebook.pack(fill="both", expand=True)
@@ -61,5 +64,9 @@ class MainPage(tk.Tk):
         
         if frame == self.usuarios_tab:
             self.usuarios_tab.clear_inputs()
+
+        if frame == self.clientes_tab:
+            self.clientes_tab.limpiar_campos_cliente()
+            self.clientes_tab.actualizar_tabla_clientes()
             
 

@@ -99,14 +99,6 @@ class DbRepo:
         siguiente_id = self.cursor.fetchone()[0]
         return siguiente_id
     
-    def buscar_cliente_por_nombre(self, nombre):
-        # Puedes usar una consulta SQL que filtre los clientes por nombre
-        consulta = "SELECT id, nombre, direccion, email, telefono FROM cliente WHERE nombre ILIKE %s"
-        self.cursor.execute(consulta, ('%' + nombre + '%',))
-        resultados = self.cursor.fetchall()
-        # Convertir los resultados en un formato más fácil de usar
-        return [(row[0], {'nombre': row[1], 'direccion': row[2], 'email': row[3], 'telefono': row[4]}) for row in resultados]
-    
     def registrar_cliente(self, id, nombre, apellido, direccion, email, telefono):
         # if the client exists, update it
         self.cursor.execute("SELECT * FROM cliente WHERE id = %s", (id,))
@@ -125,6 +117,22 @@ class DbRepo:
             return True;
         except (Exception, psycopg2.DatabaseError) as error:
             raise Exception(f"Error editando cliente: {error}")
+        
+    def buscar_cliente_por_nombre(self, nombre):
+        clientes = []
+        try:
+            # Puedes usar una consulta SQL que filtre los clientes por nombre
+            consulta = "SELECT id, nombre, apellido, puntos, direccion, email, telefono FROM cliente WHERE nombre ILIKE %s"
+            self.cursor.execute(consulta, ('%' + nombre + '%',))
+            resultados = self.cursor.fetchall()
+            
+            for id_cliente, nombre, apellido, puntos, direccion, email, telefono in resultados:
+                cliente = Cliente(id=id_cliente, nombre=nombre, apellido=apellido, direccion=direccion, email=email, telefono=telefono, puntos=puntos)
+                clientes.append(cliente)
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error buscando cliente por nombre: {error}")
+        
+        return clientes
 
     def obtener_clientes(self) -> list:
         clientes = []
@@ -150,6 +158,16 @@ class DbRepo:
             return True
         except (Exception, psycopg2.DatabaseError) as error:
             raise Exception(f"Error eliminando cliente: {error}")
+        
+    def obtener_cliente_por_id(self, id_cliente):
+        try:
+            self.cursor.execute("SELECT * FROM cliente WHERE id = %s", (id_cliente,))
+            cliente = self.cursor.fetchone()
+            if cliente:
+                return Cliente(id=cliente[0], nombre=cliente[1], apellido=cliente[2], direccion=cliente[3], email=cliente[4], telefono=cliente[5], puntos=cliente[6])
+            return None
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error obteniendo cliente por ID: {error}")
 
     
     def __del__(self):

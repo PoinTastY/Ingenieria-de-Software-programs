@@ -50,7 +50,6 @@ class ClientesTab(tk.Frame):
         button_frame.grid(row=4, column=0, columnspan=5, pady=10)
 
         ttk.Button(button_frame, text="Registrar", command=self.registrar_cliente).grid(row=0, column=0, padx=5, pady=5)
-        ttk.Button(button_frame, text="Buscar", command=self.buscar_cliente).grid(row=0, column=1, padx=5, pady=5)
         ttk.Button(button_frame, text="Editar", command=self.editar_cliente).grid(row=0, column=2, padx=5, pady=5)
         ttk.Button(button_frame, text="Eliminar", command=self.eliminar_cliente).grid(row=0, column=3, padx=5, pady=5)
         ttk.Button(button_frame, text="Limpiar", command=self.limpiar_campos_cliente).grid(row=0, column=4, padx=5, pady=5)
@@ -100,15 +99,6 @@ class ClientesTab(tk.Frame):
                 self.limpiar_campos_cliente()
         except Exception as e:
             messagebox.showerror("Error", f"No se pudo registrar el cliente: {e}")
-
-    def buscar_cliente(self):
-        nombre = self.nombre_cliente_entry.get()
-        resultados = self.db_repo.buscar_cliente_por_nombre(nombre)
-        self.tree_clientes.delete(*self.tree_clientes.get_children())
-        for id_cliente, cliente in resultados:
-            self.tree_clientes.insert("", "end", values=(id_cliente, cliente['nombre'], cliente['direccion'], cliente['email'], cliente['telefono']))
-        if not resultados:
-            messagebox.showinfo("Información", "No se encontraron clientes con ese nombre.")
 
     def editar_cliente(self):
         selected = self.tree_clientes.selection()

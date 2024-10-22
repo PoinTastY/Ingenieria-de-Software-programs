@@ -3,17 +3,20 @@ from tkinter import ttk
 from tkinter import messagebox
 
 from Interface.db_repo import DbRepo
+from Domain.Entities.cliente import Cliente
+from Presentation.Popups.buscar_cliente_toplevel import BuscarClienteToplevel
 
 class VentaTab(tk.Frame):
     def __init__(self, parent, db_repo : DbRepo):
         super().__init__(parent)
         self.parent = parent
         self.db_repo = db_repo
+        self.cliente_seleccionado = Cliente()
         self.pack()
         self.build_ui()
 
     def build_ui(self):
-        self.btn_cliente = tk.Button(self, text="Cliente")
+        self.btn_cliente = tk.Button(self, text="Cliente", command=self.buscar_cliente)
         self.btn_cliente.grid(row=0, column=0, columnspan=6, padx=10, pady=5)
         self.entry_cantidad = tk.Entry(self, width=5)
         self.entry_cantidad.grid(row=1, column=0, padx=10, pady=5)
@@ -42,6 +45,12 @@ class VentaTab(tk.Frame):
         self.btn_pagar.grid(row=4, column=0, columnspan=7,padx=10, pady=5)
         self.btn_pagar.bind("<F12>", self.pay)
         self.entry_codigo.focus_set()
+    
+    def buscar_cliente(self):
+        ventana_buscar_cliente = BuscarClienteToplevel(self, self.db_repo)
+        ventana_buscar_cliente.grab_set()
+        self.wait_window(ventana_buscar_cliente)
+
     
     def buscar_producto(self, event):
         codigo = self.entry_codigo.get()

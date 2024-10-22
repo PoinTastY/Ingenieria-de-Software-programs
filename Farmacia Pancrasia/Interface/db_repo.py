@@ -1,3 +1,4 @@
+import datetime
 import psycopg2
 
 from Domain.Entities.usuario import Usuario
@@ -37,13 +38,13 @@ class DbRepo:
         self.conn.commit()
 
     def search_producto(self, codigo : str):
-        self.cursor.execute("SELECT * FROM producto WHERE codigo = %s", (codigo,))
+        self.cursor.execute("SELECT * FROM producto WHERE codigo = %s", (str(codigo),))
         product = self.cursor.fetchone()
         if product:
             #create a Producto object
             return Producto(id=product[0], codigo=product[1], descripcion=product[2], precio=product[3], stock=product[4])
-        return None
-
+        raise Exception("Producto no encontrado")
+    
     def buscar_usuario(self, nombre : str):
         self.cursor.execute("SELECT * FROM usuario WHERE nombre = %s", (nombre,))
         user = self.cursor.fetchone()
@@ -88,6 +89,32 @@ class DbRepo:
         if product:
             return product
         return None
+    
+    def buscar_producto_por_nombre(self, busqueda):
+        clientes = []
+        try:
+            # Puedes usar una consulta SQL que filtre los clientes por nombre
+            consulta = "SELECT id, codigo, descripcion, precio, stock FROM producto WHERE descripcion ILIKE %s"
+            self.cursor.execute(consulta, ('%' + busqueda + '%',))
+            resultados = self.cursor.fetchall()
+            
+            for id_producto, codigo, descripcion, precio, stock in resultados:
+                cliente = Producto(id=id_producto, codigo=codigo, descripcion=descripcion, precio=precio, stock=stock)
+                clientes.append(cliente)
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error buscando cliente por nombre: {error}")
+        
+        return clientes
+    
+    def obtener_producto_por_id(self, id_producto):
+        try:
+            self.cursor.execute("SELECT * FROM producto WHERE id = %s", (id_producto,))
+            producto = self.cursor.fetchone()
+            if producto:
+                return Producto(id=producto[0], codigo=producto[1], descripcion=producto[2], precio=producto[3], stock=producto[4])
+            return None
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error obteniendo cliente por ID: {error}")
         
     def obtener_siguiente_id_cliente(self):
         # Obtiene el nombre de la secuencia asociada a la columna 'id' de la tabla 'cliente'
@@ -133,6 +160,14 @@ class DbRepo:
             raise Exception(f"Error buscando cliente por nombre: {error}")
         
         return clientes
+    
+    def update_cliente_points(self, id_cliente, total):
+        #for each 100 pesos, the client gets 1 point
+        points = total // 100
+        self.cursor.execute("UPDATE cliente SET puntos = puntos + %s WHERE id = %s", (points, id_cliente))
+        self.conn.commit()
+
+        return points
 
     def obtener_clientes(self) -> list:
         clientes = []
@@ -168,7 +203,39 @@ class DbRepo:
             return None
         except (Exception, psycopg2.DatabaseError) as error:
             raise Exception(f"Error obteniendo cliente por ID: {error}")
+        
+    def create_venta(self, id_cliente, id_usuario, total) -> int:
+        try:
+            
+            fecha = datetime.datetime.now()
+            self.cursor.execute("INSERT INTO venta (id_cliente, id_usuario, fecha, total) VALUES (%s, %s, %s, %s)", (id_cliente, id_usuario, fecha, total))
+            self.conn.commit()
 
+            #obtener el id de la venta
+            self.cursor.execute("SELECT MAX(id) FROM venta")
+            id_venta = self.cursor.fetchone()[0]
+            return id_venta
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error creando venta: {error}")
+        
+
+        
+    def create_detalle_venta(self, id_venta, id_producto, cantidad):
+        try:
+            #discount stock
+            self.cursor.execute("SELECT stock FROM producto WHERE id = %s", (id_producto,))
+            stock = self.cursor.fetchone()[0]
+            if stock < cantidad:
+                raise Exception("No hay suficiente stock para el producto")
+            self.cursor.execute("UPDATE producto SET stock = %s WHERE id = %s", (stock - cantidad, id_producto))
+            self.conn.commit()
+            #create detalle_venta
+            self.cursor.execute("INSERT INTO venta_detalle (id_venta, id_producto, cantidad) VALUES (%s, %s, %s)", (id_venta, id_producto, cantidad))
+            self.conn.commit()
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error creando detalle de venta: {error}")
     
     def __del__(self):
         self.cursor.close()

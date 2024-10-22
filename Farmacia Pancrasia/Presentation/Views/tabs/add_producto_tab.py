@@ -20,7 +20,7 @@ class AddProductoTab(tk.Frame):
         self.entry_codigo.grid(row=0, column=1, padx=10, pady=10)
 
         # Botón para buscar producto
-        self.boton_buscar = tk.Button(self, text="Buscar", command=self.buscar_producto)
+        self.boton_buscar = tk.Button(self, text="Buscar", command= lambda : self.buscar_producto(None))
         self.boton_buscar.grid(row=0, column=2, padx=10, pady=10)
         self.boton_buscar.bind("<Return>", self.buscar_producto)
         

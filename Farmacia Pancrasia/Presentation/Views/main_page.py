@@ -15,7 +15,7 @@ class MainPage(tk.Tk):
         self.db_repo = db_repo
         self.user = user
         self.title("Taller Mecanico")
-        self.geometry("670x500")
+        self.geometry("825x500")
         self.login = login
         self.build_ui()
 
@@ -23,7 +23,7 @@ class MainPage(tk.Tk):
         self.notebook = ttk.Notebook(self)
 
         #define tabs
-        self.ventas_tab = VentaTab(self.notebook, self.db_repo)
+        self.ventas_tab = VentaTab(self.notebook, self.db_repo, self.user)
         self.add_producto_tab = AddProductoTab(self.notebook, self.db_repo)
         self.usuarios_tab = UsuariosTab(self.notebook, self.db_repo)
         self.clientes_tab = ClientesTab(self.notebook, self.db_repo)

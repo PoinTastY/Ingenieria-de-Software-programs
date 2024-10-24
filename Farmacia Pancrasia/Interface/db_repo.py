@@ -4,7 +4,7 @@ import psycopg2
 from Domain.Entities.usuario import Usuario
 from Domain.Entities.producto import Producto
 from Domain.Entities.cliente import Cliente
-
+from Domain.Entities.proveedor import Proveedor
 
 class DbRepo:
     def __init__(self):
@@ -43,7 +43,7 @@ class DbRepo:
         if product:
             #create a Producto object
             return Producto(id=product[0], codigo=product[1], descripcion=product[2], precio=product[3], stock=product[4])
-        raise Exception("Producto no encontrado")
+        raise Exception("Producto no encontrado (Codigo Proporcionado: {})".format(str(codigo)))
     
     def buscar_usuario(self, nombre : str):
         self.cursor.execute("SELECT * FROM usuario WHERE nombre = %s", (nombre,))
@@ -126,6 +126,16 @@ class DbRepo:
         siguiente_id = self.cursor.fetchone()[0]
         return siguiente_id
     
+    def obtener_siguiente_id_proveedor(self):
+        # Obtiene el nombre de la secuencia asociada a la columna 'id' de la tabla 'cliente'
+        self.cursor.execute("SELECT pg_get_serial_sequence('proveedor', 'id')")
+        secuencia = self.cursor.fetchone()[0]
+
+        # Consulta el siguiente valor proyectado de la secuencia
+        self.cursor.execute(f"SELECT last_value + 1 FROM {secuencia}")
+        siguiente_id = self.cursor.fetchone()[0]
+        return siguiente_id
+    
     def registrar_cliente(self, id, nombre, apellido, direccion, email, telefono):
         # if the client exists, update it
         self.cursor.execute("SELECT * FROM cliente WHERE id = %s", (id,))
@@ -136,10 +146,29 @@ class DbRepo:
         self.cursor.execute("INSERT INTO cliente ( nombre, apellido, direccion, email, telefono) VALUES (%s, %s, %s, %s, %s)", ( nombre, apellido, direccion, email, telefono))
         self.conn.commit()
         return True
+    
+    def registrar_proveedor(self, id, nombre, direccion, telefono):
+        # if the client exists, update it
+        self.cursor.execute("SELECT * FROM proveedor WHERE id = %s", (id,))
+        proveedor = self.cursor.fetchone()
+        if proveedor:
+            self.editar_cliente(proveedor[0], nombre, direccion, telefono)
+            return True
+        self.cursor.execute("INSERT INTO proveedor ( nombre, direccion, telefono) VALUES (%s, %s, %s)", ( nombre, direccion, telefono))
+        self.conn.commit()
+        return True
 
     def editar_cliente(self, id_cliente, nombre, apellido, direccion, email, telefono):
         try:
             self.cursor.execute("UPDATE cliente SET nombre = %s, apellido = %s, direccion = %s, email = %s, telefono = %s WHERE id = %s", (nombre, apellido, direccion, email, telefono, id_cliente))
+            self.conn.commit()
+            return True;
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error editando cliente: {error}")
+        
+    def editar_proveedor(self, id_proveedor, nombre, direccion, telefono):
+        try:
+            self.cursor.execute("UPDATE proveedor SET nombre = %s, direccion = %s, telefono = %s WHERE id = %s", (nombre, direccion, telefono, id_proveedor))
             self.conn.commit()
             return True;
         except (Exception, psycopg2.DatabaseError) as error:
@@ -160,6 +189,32 @@ class DbRepo:
             raise Exception(f"Error buscando cliente por nombre: {error}")
         
         return clientes
+    
+    def buscar_proveedor_por_nombre(self, nombre):
+        proveedores = []
+        try:
+            # Puedes usar una consulta SQL que filtre los clientes por nombre
+            consulta = "SELECT id, nombre, direccion, telefono FROM proveedor WHERE nombre ILIKE %s"
+            self.cursor.execute(consulta, ('%' + nombre + '%',))
+            resultados = self.cursor.fetchall()
+            
+            for id, nombre, direccion, telefono in resultados:
+                proveedor = Proveedor(id=id, nombre=nombre, direccion=direccion, telefono=telefono)
+                proveedores.append(proveedor)
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error buscando proveedor por nombre: {error}")
+        
+        return proveedores
+    
+    def obtener_proveedor_por_id(self, id_proveedor):
+        try:
+            self.cursor.execute("SELECT * FROM proveedor WHERE id = %s", (id_proveedor,))
+            cliente = self.cursor.fetchone()
+            if cliente:
+                return Proveedor(id=cliente[0], nombre=cliente[1], direccion=cliente[2], telefono=cliente[3])
+            return None
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error obteniendo proveedor por ID: {error}")
     
     def update_cliente_points(self, id_cliente, total):
         #for each 100 pesos, the client gets 1 point
@@ -186,6 +241,23 @@ class DbRepo:
         
         return clientes
     
+    def obtener_proveedores(self) -> list:
+        proveedores = []
+        try:
+            query = "SELECT id, nombre, direccion, telefono FROM proveedor"
+            self.cursor.execute(query)
+            resultados = self.cursor.fetchall()
+            
+            # Procesa los resultados y crea objetos Cliente
+            for id_proveedor, nombre, direccion, telefono in resultados:
+                proveedor = Proveedor(id=id_proveedor, nombre=nombre, direccion=direccion, telefono=telefono)
+                proveedores.append(proveedor)
+
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error obteniendo clientes: {error}")
+        
+        return proveedores
+    
     def eliminar_cliente(self, id_cliente):
         try:
             self.cursor.execute("DELETE FROM cliente WHERE id = %s", (id_cliente,))
@@ -193,6 +265,14 @@ class DbRepo:
             return True
         except (Exception, psycopg2.DatabaseError) as error:
             raise Exception(f"Error eliminando cliente: {error}")
+        
+    def eliminar_proveedor(self, id_proveedor):
+        try:
+            self.cursor.execute("DELETE FROM proveedor WHERE id = %s", (id_proveedor,))
+            self.conn.commit()
+            return True
+        except (Exception, psycopg2.DatabaseError) as error:
+            raise Exception(f"Error eliminando proveedor: {error}")
         
     def obtener_cliente_por_id(self, id_cliente):
         try:
@@ -219,7 +299,7 @@ class DbRepo:
         except (Exception, psycopg2.DatabaseError) as error:
             raise Exception(f"Error creando venta: {error}")
         
-    def create_compra(self, id_proveedor, id_usuario, referencia, fecha) -> int:
+    def create_compra(self, id_proveedor, id_usuario, referencia) -> int:
         try:
             
             fecha = datetime.datetime.now()
@@ -232,7 +312,7 @@ class DbRepo:
             return id_compra
 
         except (Exception, psycopg2.DatabaseError) as error:
-            raise Exception(f"Error creando venta: {error}")
+            raise Exception(f"Error creando compra: {error}")
         
 
         
@@ -257,16 +337,15 @@ class DbRepo:
             #discount stock
             self.cursor.execute("SELECT stock FROM producto WHERE id = %s", (id_producto,))
             stock = self.cursor.fetchone()[0]
-            if stock < cantidad:
-                raise Exception("No hay suficiente stock para el producto")
+            
             self.cursor.execute("UPDATE producto SET stock = %s WHERE id = %s", (stock + cantidad, id_producto))
             self.conn.commit()
             #create detalle_venta
-            self.cursor.execute("INSERT INTO compra_detalle (id_venta, id_producto, cantidad) VALUES (%s, %s, %s)", (id_venta, id_producto, cantidad))
+            self.cursor.execute("INSERT INTO compra_detalle (id_compra, id_producto, cantidad) VALUES (%s, %s, %s)", (id_venta, id_producto, cantidad))
             self.conn.commit()
 
         except (Exception, psycopg2.DatabaseError) as error:
-            raise Exception(f"Error creando detalle de venta: {error}")
+            raise Exception(f"Error creando detalle de compra: {error}")
     
     def __del__(self):
         self.cursor.close()

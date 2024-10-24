@@ -88,39 +88,41 @@ class VentaTab(tk.Frame):
 
     def buscar_producto(self, event):
         codigo = self.entry_codigo.get()
+        try:
+            if codigo == "":
+                buscar_producto = BuscarProductoTopLevel(self, self.db_repo)
+                buscar_producto.grab_set()
+                self.wait_window(buscar_producto)
+            else:
+                self.codigo = codigo
 
-        if codigo == "":
-            buscar_producto = BuscarProductoTopLevel(self, self.db_repo)
-            buscar_producto.grab_set()
-            self.wait_window(buscar_producto)
-        else:
-            self.codigo = codigo
+            producto = self.db_repo.search_producto(self.codigo)
+            if producto:
+                #if product already in treeview, update quantity
+                for child in self.tree_productos.get_children():
+                    if self.tree_productos.item(child)["values"][1] == producto.descripcion:
+                        self.tree_productos.item(child, values=(producto.codigo, producto.descripcion, producto.precio, int(self.tree_productos.item(child)["values"][2])+1))
+                        self.entry_codigo.delete(0, tk.END)
+                        self.get_total()
+                        self.label_total.config(text="Total: $"+str(self.get_total()))
+                        self.entry_codigo.focus_set()
+                        return
+                self.tree_productos.insert("", tk.END, values=(producto.codigo, producto.descripcion, producto.precio, self.entry_cantidad.get()))
+                self.entry_codigo.delete(0, tk.END)
 
-        producto = self.db_repo.search_producto(self.codigo)
-        if producto:
-            #if product already in treeview, update quantity
-            for child in self.tree_productos.get_children():
-                if self.tree_productos.item(child)["values"][1] == producto.descripcion:
-                    self.tree_productos.item(child, values=(producto.codigo, producto.descripcion, producto.precio, int(self.tree_productos.item(child)["values"][2])+1))
-                    self.entry_codigo.delete(0, tk.END)
-                    self.get_total()
-                    self.label_total.config(text="Total: $"+str(self.get_total()))
-                    self.entry_codigo.focus_set()
-                    return
-            self.tree_productos.insert("", tk.END, values=(producto.codigo, producto.descripcion, producto.precio, self.entry_cantidad.get()))
-            self.entry_codigo.delete(0, tk.END)
-
-            total = self.get_total()
-                
-            self.label_total.config(text="Total: $"+str(total))
+                total = self.get_total()
+                    
+                self.label_total.config(text="Total: $"+str(total))
+                self.entry_codigo.focus_set()
+            else:
+                messagebox.showerror("Error", "Producto no encontrado")
+                self.entry_codigo.delete(0, tk.END)
+                self.entry_codigo.focus_set()
+            self.entry_cantidad.delete(0, tk.END)
+            self.entry_cantidad.insert(0, "1")
             self.entry_codigo.focus_set()
-        else:
-            messagebox.showerror("Error", "Producto no encontrado")
-            self.entry_codigo.delete(0, tk.END)
-            self.entry_codigo.focus_set()
-        self.entry_cantidad.delete(0, tk.END)
-        self.entry_cantidad.insert(0, "1")
-        self.entry_codigo.focus_set()
+        except Exception as e:
+            messagebox.showerror("Error", str(e))
     
     def add_cuantity(self):
         #if product is selected, update quantity
@@ -174,12 +176,12 @@ class VentaTab(tk.Frame):
             for child in self.tree_productos.get_children():
                 producto = self.db_repo.search_producto(self.tree_productos.item(child)["values"][0])
                 self.db_repo.create_detalle_venta(id_venta, producto.id, int(self.tree_productos.item(child)["values"][3]))
-                self.db_repo.update_producto(producto.codigo, producto.descripcion, producto.precio, producto.stock - Decimal(self.tree_productos.item(child)["values"][3]))
             
             #update cliente points
             puntos_ganados = self.db_repo.update_cliente_points(self.cliente_seleccionado.id, self.get_total())
             
             messagebox.showinfo("Éxito", f"Venta concretada + {puntos_ganados} puntos para {self.cliente_seleccionado.nombre}")
+            
             self.tree_productos.delete(*self.tree_productos.get_children())
             self.label_total.config(text="Total: $0.00")
             self.entry_codigo.delete(0, tk.END)

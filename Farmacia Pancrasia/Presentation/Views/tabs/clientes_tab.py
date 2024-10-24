@@ -91,6 +91,7 @@ class ClientesTab(tk.Frame):
             direccion = self.direccion_cliente_entry.get()
             email = self.email_cliente_entry.get()
             telefono = self.telefono_cliente_entry.get()
+            telefono = telefono[:10]
             
             # Cambié self.hotel por self.db_repo para acceder a la base de datos
             if self.db_repo.registrar_cliente(id, nombre, apellido, direccion, email, telefono):
@@ -111,6 +112,7 @@ class ClientesTab(tk.Frame):
         direccion = self.direccion_cliente_entry.get()
         email = self.email_cliente_entry.get()
         telefono = self.telefono_cliente_entry.get()
+        telefono = telefono[:10]
         
         if self.db_repo.editar_cliente(id_cliente, nombre, apellido, direccion, email, telefono):
             messagebox.showinfo("Éxito", "Cliente editado correctamente.")

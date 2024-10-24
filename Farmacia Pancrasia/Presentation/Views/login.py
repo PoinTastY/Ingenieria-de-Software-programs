@@ -41,9 +41,11 @@ class Login(tk.Tk):
                 self.entry_usuario.delete(0, tk.END)
                 self.entry_password.delete(0, tk.END)
                 messagebox.showerror("Error", "Usuario o contraseña incorrecta.")
+                self.entry_usuario.focus_set()
 
         except Exception as e:
             messagebox.showerror("Error", "Usuario o contraseña incorrecta. ({})".format(e))
+            self.entry_usuario.focus_set()
     
     def on_closing(self):
         self.mainpage.destroy()

@@ -73,7 +73,7 @@ class CompraTab(tk.Frame):
         selected = self.tree_productos.selection()
         if selected:
             if int(self.tree_productos.item(selected)["values"][3]) > 1:
-                self.tree_productos.item(selected, values=(str(self.tree_productos.item(selected)["values"][0]), self.tree_productos.item(selected)["values"][1], self.tree_productos.item(selected)["values"][2], int(self.tree_productos.item(selected)["values"][3])+1))
+                self.tree_productos.item(selected, values=(str(self.tree_productos.item(selected)["values"][0]), self.tree_productos.item(selected)["values"][1], self.tree_productos.item(selected)["values"][2], Decimal(self.tree_productos.item(selected)["values"][3])+1))
                 self.label_total.config(text="Total: $"+str(self.get_total()))
             else:
                 self.tree_productos.delete(selected)
@@ -101,7 +101,8 @@ class CompraTab(tk.Frame):
                 #if product already in treeview, update quantity
                 for child in self.tree_productos.get_children():
                     if self.tree_productos.item(child)["values"][1] == producto.descripcion:
-                        self.tree_productos.item(child, values=(str(producto.codigo), producto.descripcion, producto.precio, int(self.tree_productos.item(child)["values"][2])+1))
+                        cantidad =  Decimal(self.tree_productos.item(child)["values"][3])+Decimal(self.entry_cantidad.get())
+                        self.tree_productos.item(child, values=(str(producto.codigo), producto.descripcion, producto.precio,cantidad))
                         self.entry_codigo.delete(0, tk.END)
                         self.get_total()
                         self.label_total.config(text="Total: $"+str(self.get_total()))
@@ -128,7 +129,7 @@ class CompraTab(tk.Frame):
         #if product is selected, update quantity
         selected = self.tree_productos.selection()
         if selected:
-            self.tree_productos.item(selected, values=(str(self.tree_productos.item(selected)["values"][0]), self.tree_productos.item(selected)["values"][1], self.tree_productos.item(selected)["values"][2], int(self.tree_productos.item(selected)["values"][3])+1))
+            self.tree_productos.item(selected, values=(str(self.tree_productos.item(selected)["values"][0]), self.tree_productos.item(selected)["values"][1], self.tree_productos.item(selected)["values"][2], Decimal(self.tree_productos.item(selected)["values"][3])+1))
             self.label_total.config(text="Total: $"+str(self.get_total()))
         else:
             #icrement entry_cuantity
